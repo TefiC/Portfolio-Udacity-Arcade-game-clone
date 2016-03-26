@@ -4,7 +4,7 @@ An html5 game inspired by "frogger".
 
 ### Game Instructions
 ---
-The game will start automatically when the screen loads. You are a poor ant collecting food for your nest to survive a hard winter, collect as many leaves and gems as you can without colliding with those mean bugs that will harm you! You have 10 lives, use them wisely.
+The game will start automatically when the screen loads. You are a poor ant collecting food for your nest to survive a hard winter, collect as many leaves, gems and cherries as you can without colliding with those mean bugs that will harm you! You have 10 lives, use them wisely.
 
 You can move your character by pressing the `up`, `down`, `right` and `left` keys. Depending on the surface, the player will have different speeds (It will move **faster** in stone and **slower** in water). Your goal is to collect the necessary score for each level by reaching collectible items that will add to your score counter. 
 
