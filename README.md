@@ -4,7 +4,7 @@ An html5 game inspired by "frogger".
 
 ### Game Instructions
 ---
-The game will start automatically when the screen loads. You are a poor ant collecting food for your nest to survive a hard winter, collect as many leaves and gems as you can without colliding with those mean bugs that will harm you! You have 10 lives, use them wisely.
+The game will start automatically when the screen loads. You are a poor ant collecting food for your nest to survive a hard winter, collect as many leaves, cherries and gems as you can without colliding with those mean bugs that will harm you! You have 10 lives, use them wisely.
 
 You can move your character by pressing the `up`, `down`, `right` and `left` keys. Depending on the surface, the player will have different speeds (It will move **faster** in stone and **slower** in water). Your goal is to collect the necessary score for each level by reaching collectible items that will add to your score counter. 
 
@@ -34,23 +34,19 @@ They add to your score.
 
 
 ##### Enemies
-Don't collide with bugs!!! they will hurt you. Each time you do, your player will lose 1 life, 4 points and it will go back to its initial location.
+Don't collide with bugs, frogs or snakes!!! they will hurt you. Each time you do, your player will lose 1 life and 4 points and it will go back to its initial location. (WARNING: Spiders are very dangerous, you will lose **2** lives if you collide with them)
 . 
 ##### Winning and losing
-If you succesfully complete all levels, a screen will appear showing your total score. If you run out of lives, you will lose and you will have to start all over again.
+If you succesfully complete all levels, a screen will appear showing your total score. If you run out of lives, you will lose and you will have to start again.
 
-### Installation instructions
+### Installation
 ---- 
 The game doesn't require any installations or additional software. You only have to click on `index.html` and the game will execute on your browser. 
-
-###Bugs
-----
-At the moment, I'm developing an algorithm to check if two bugs are on top of each other after random Y coordinates are generates for each enemy when the player moves on to the new level.
 
 ### License and Copyright
 ---
 * This is a Udacity project. Base code was provided. 
-* Images were provided by Udacity, except [Ant](https://pixabay.com/es/hormiga-asusta-insectos-asustado-44589/), [leaves](https://pixabay.com/es/arce-oto%C3%B1o-de-la-hoja-orange-tonos-150741/) and [Cherries](https://pixabay.com/es/cereza-madre-frutas-rojo-madura-575547/) ([Pixabay.com](pixabay.com))  They are all licensed under [CC0 creative commons](https://creativecommons.org/about/cc0/)  
+* Images were provided by Udacity, except [Ant](https://pixabay.com/es/hormiga-asusta-insectos-asustado-44589/), [leaves](https://pixabay.com/es/arce-oto%C3%B1o-de-la-hoja-orange-tonos-150741/), [Cherries](https://pixabay.com/es/cereza-madre-frutas-rojo-madura-575547/), [Frog](https://pixabay.com/es/rana-anfibios-tropicales-selva-46393/), [Snake](https://pixabay.com/es/serpiente-amarillo-p%C3%BArpura-reptil-46139/) and [Spider](https://pixabay.com/es/ara%C3%B1a-horripilante-ar%C3%A1cnido-miedo-311548/).  ([Pixabay.com](pixabay.com))  They are all licensed under [CC0 creative commons](https://creativecommons.org/about/cc0/)  
 * Sounds were downloaded from [opengameart.org](opengameart.org)
     * [death.wav](http://opengameart.org/content/oldschool-win-and-die-jump-and-run-sounds) and [round_end.wav](http://opengameart.org/content/oldschool-win-and-die-jump-and-run-sounds) are licensed under public domain. Their autor is sauer2. 
     * [Accept.wav](http://opengameart.org/content/ui-accept-or-forward) is licensed under creative commons. Its author is 
