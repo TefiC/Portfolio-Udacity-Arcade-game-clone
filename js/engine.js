@@ -25,22 +25,20 @@ var Engine = (function(global) {
 		ctx = canvas.getContext('2d'),
 		lastTime;
 
-	canvas.width = 1006; //ORIGINAL 505
-	canvas.height = 905; //ORIGINAL 606
+	canvas.width = 1006;
+	canvas.height = 905;
 	doc.body.appendChild(canvas);
 
-	//Declaring important variables 
-
-	//Life counter
-	var lives= 10;
+	//Lives counter
+	var lives = 10;
 
 	//Score counter
 	var score = 0;
 
 	//Initial Score for each level
-	var scoreLevel1= score; //For total score to update even during level 1
-	var scoreLevel2= 0;
-	var scoreLevel3= 0;
+	var scoreLevel1 = score; //For total score to update even during level 1
+	var scoreLevel2 = 0;
+	var scoreLevel3 = 0;
 
 	//Declaring totalScore variable
 	var totalScore;
@@ -50,15 +48,15 @@ var Engine = (function(global) {
 
 	//Declaring variable for score left to collect to pass the level
 	var scoreNeeded;
-   
+
 	//Check collision with finish line
 	var starCollision = false;
 
-	//Create a level variable for the initial level, and set it as a global variable
-	global.level=1; 
+	//Declare a level variable for the first level, and set it as a global variable
+	global.level = 1;
 
 	//Max Level
-	var maxLevel=3;    
+	var maxLevel = 3;
 
 
 	/* This function serves as the kickoff point for the game loop itself
@@ -89,31 +87,28 @@ var Engine = (function(global) {
 		 * function again as soon as the browser is able to draw another frame.
 		 */
 
-		 /* If statement to check if the game goes on, or if the player wins or loses. If the player 
-		 * still has lives left and it hasn't collided with the star, keep the game loop active. 
-		 * If the player still has lives, has collided with the star and reached the minimum score 
+		/* If statement to check if the game goes on, or if the player wins or loses. If the player
+		 * still has lives left and it hasn't collided with the star, keep the game loop active.
+		 * If the player still has lives, has collided with the star and reached the minimum score
 		 * to pass the max level, execute youWin(). Otherwise, if the player has no lives left, execute gameOver().
 		 */
-		if(lives>0 && starCollision==false){
+		if (lives > 0 && starCollision === false) {
 			//Still alive
 			win.requestAnimationFrame(main);
-		}else if(starCollision==true){
-			//You win
+		}else if (starCollision === true) {
 			youWin();
-		}else{
-			//Game over
+		}else {
 			gameOver();
 		}
 	}
 
 	/* This function does some initial setup that should only occur once,
 	 * particularly setting the lastTime variable that is required for the
-	 * game loop.
+	 * game loop and resets the player's coordinates
 	 */
 	function init() {
-		reset();
+		player.reset();
 		lastTime = Date.now();
-		//Play sound
 		playInitSound();
 		//Start game engine
 		main();
@@ -130,7 +125,7 @@ var Engine = (function(global) {
 	 */
 	function update(dt) {
 		updateEntities(dt);
-		checkCollisions();        
+		checkCollisions();
 	}
 
 	/* This is called by the update function and loops through all of the
@@ -150,128 +145,135 @@ var Engine = (function(global) {
 		});
 
 		//Update player
-		player.update();      
+		player.update();
 	}
 
 	//COLLISION DETECTION
+
+	/**
+	 * Checks collision between the player and enemies, collectible items and the finish line (Star).
+	 * First, I make a box that surrounds the player and then execute three separate functions to check each collisions with each one.
+	 */
 	function checkCollisions() {
 
-		//Box that surrounds the player
-		var playerBox={
-			"x": player.x,
-			"y": player.y,
-			"width": 70,
-			"height": 80
+		var playerBox = {
+			'x': player.x,
+			'y': player.y,
+			'width': 70,
+			'height': 80
 		};
 
-		//Check collision with each enemy, each collectible item and finish line(star).
 		checkCollisionEnemy();
 		checkCollisionStar();
 		checkCollisionItems();
 
-
 		//FUNCTIONS TO CHECK COLLISION
 
-		//ENEMIES
-		function checkCollisionEnemy(){
-			//For loop to check collisions with each enemy
-			allEnemies.forEach(function(enemy){
-				//Surrounding box for each enemy
-				var enemyBox={
-					"x": enemy.x,
-					"y": enemy.y,
-					"width": 40,
-					"height": 40
-				}
+			//ENEMIES
 
-				//Setting condition for collision with enemy 
-				if(enemyBox.x<playerBox.x+playerBox.width && enemyBox.x+ enemyBox.width> playerBox.x && enemyBox.y<playerBox.y+playerBox.height && enemyBox.height+enemyBox.y>playerBox.y) {
-					// Subtract lives from the counter
-					// If the enemy is a spider, subtract two lives,
-					// Else, subtract one life.
-					if(enemy.description=="spider"){
-						lives-= 2;
-					}else{
-						lives-=1;
+		/**
+		 * Checks collision between the player and enemies. A for loop checks each enemy in allEnemies array, creating a "box"
+		 * that surrounds it and then checks if the conditions for collision with the player's box declared previously are true. Depending on the type
+		 * of enemy the player collides with, lives will be subtracted from the counter (2 if it collides with a spider, 1 if it collides
+		 * with any other type of enemy) and four points will be substracted from the score counter, but if the score counter will be negative,
+		 * it sets it to 0. Then it resets the player's coordinates to where it started.
+		 */
+		function checkCollisionEnemy() {
+			allEnemies.forEach(function(enemy) {
+				var enemyBox = {
+					'x': enemy.x,
+					'y': enemy.y,
+					'width': 40,
+					'height': 40
+				};
+
+				if (enemyBox.x < playerBox.x + playerBox.width && enemyBox.x + enemyBox.width > playerBox.x && enemyBox.y < playerBox.y + playerBox.height && enemyBox.height + enemyBox.y > playerBox.y) {
+
+					if (enemy.description == 'spider') {
+						lives -= 2;
+					} else {
+						lives -= 1;
 					}
-					
-					//Subtract 4 points from the score for each collision with an enemy 
-					//(if the counter will be negative, set score to 0)
-					if(score-4>=0){
-						score-=4;
-					}else if(score-4<0){
-						score==0;
+
+					if (score - 4 >= 0) {
+						score -= 4;
+					} else if (score - 4 < 0) {
+						score = 0;
 					}
-					//Reset player's coordinates    
-					reset();
+
+					player.reset();
 				}
 			});
 		}
 
-		//STAR        
-		function checkCollisionStar(){
-			//Box that surrounds star
-			var starBox={
-				"x": starX,
-				"y": starY,
-				"width": 40,
-				"height": 80
-			}
+		//STAR
 
-			//Check collision with star
+		/**
+		 * Checks collision between the player and the Star. It creates a "box" that surrounds the star, then checks if the
+		 * conditions for collision between the player's box and the star's box are true. If so, if the player is on level 1,
+		 * and there is more than 1 level and the player reaches the minimum score to pass to the next level, plays a sound and
+		 * executes a function to move on to the next level. Else, if the player is on the max level, collides with the star, and
+		 * it reaches the minimum score to pass, it sets starCollision to true so the game engine will stop and execute youWin().
+	 	 * Lastly, for both cases,it resets the player's coordinates.
+		 */
+		function checkCollisionStar() {
 
-			//Set conditions for collision with the star
-			if(starBox.x<playerBox.x+playerBox.width && starBox.x+ starBox.width> playerBox.x && starBox.y<playerBox.y+playerBox.height && starBox.height+starBox.y>playerBox.y){
+			var starBox = {
+				'x': STARX,
+				'y': STARY,
+				'width': 40,
+				'height': 80
+			};
 
-				//If the player is on level 1, and there is more than 1 level and the player reaches the minimum score to pass.
-				if(level>=1 && level!=maxLevel && score>=minScoreToPass){
-					//Play sound 
-					playInitSound()
-					
-					//Move on to the next level
-					nextLevel();                
-					
-				// Else if the player is on the max level, collides with the star and reaches the minimum 
-				// score to pass, set starCollision to true
-				}else if(level==maxLevel && score>=minScoreToPass){
+			if (starBox.x < playerBox.x + playerBox.width && starBox.x + starBox.width > playerBox.x && starBox.y < playerBox.y + playerBox.height && starBox.height + starBox.y > playerBox.y) {
+
+				if (level >= 1 && level != maxLevel && score >= minScoreToPass) {
+					playInitSound();
+					nextLevel();
+				} else if (level == maxLevel && score >= minScoreToPass) {
 					starCollision = true;
 				}
-
-				//Reset player's coordinates for both cases            
-				reset();
+				player.reset();
 			}
 		}
 
 		//COLLECTIBLE ITEMS
-		function checkCollisionItems(){
-			allCollectibleItems.forEach(function(item){
-				//Box that surrounds gem 
-				var itemBox={
-					"x": item.x,
-					"y": item.y,
-					"width": 40,
-					"height": 40
-				} 
+
+		/**
+		 * Checks collision between the player and Collectible items. Creates a "box" that surrounds the collectible item,
+		 * then it checks if the condition for collision between the player's box and the collectible item's box is true.
+		 * Then, it sets some conditions to add score to the counter depending on the "description" attribute of the collectible
+		 * item the player collided with (if its a leaf, adds 5 to the score, if its a cherry it adds 10 to the score,
+		 * if its a gem it add 30 to the score) and finally, it executes the item's update method to update its coordinates to
+		 * random X and Y coordinates.
+		 */
+		function checkCollisionItems() {
+			allCollectibleItems.forEach(function(item) {
+				//Box that surrounds gem
+				var itemBox = {
+					'x': item.x,
+					'y': item.y,
+					'width': 40,
+					'height': 40
+				};
 
 				//Set condition for collision with collectible item
-				if(itemBox.x<playerBox.x+playerBox.width && itemBox.x+ itemBox.width> playerBox.x && itemBox.y<playerBox.y+playerBox.height && itemBox.height+itemBox.y>playerBox.y) {
+				if (itemBox.x < playerBox.x + playerBox.width && itemBox.x + itemBox.width > playerBox.x && itemBox.y < playerBox.y + playerBox.height && itemBox.height + itemBox.y > playerBox.y) {
 					//If the item is a leaf, add 5 to the score
-					if(item.description=="leaf"){
+					if (item.description == 'leaf') {
 						score += 5;
 					//If its a cherry, add 10 to the score
-					}else if(item.description=="cherry"){
+					} else if (item.description == 'cherry') {
 						score += 10;
 					//If its a gem, add 30 to the score
-					}else if(item.description=="gem"){
+					} else if (item.description == 'gem') {
 						score += 30;
-					}   
+					}
 
-					//After collision, generate random X and Y coordinates for the item
-					item.x = generateRandomCoordX();
-					item.y = generateRandomCoordY();
+					item.update();
 				}
 			});
-		}        
+		}
 	}
 
 	/* This function initially draws the "game level", it will then call
@@ -281,59 +283,58 @@ var Engine = (function(global) {
 	 * they are just drawing the entire screen over and over.
 	 */
 	function render() {
-		/* This array holds the relative URL to the image used
-		 * for that particular row of the game level.
-		 */
+
 		var numRows = 9;
 		var numCols = 10;
 		var row, col;
+		var colImages;
 
-		//Define the layout of the tiles for each particular level
-		if(level==1){
-			var colImages = [
-					'images/water-block.png',   //Water
-					'images/stone-block.png',   //Stone
-					'images/stone-block.png',   //Stone
-					'images/water-block.png',   //Water
-					'images/grass-block.png',   //Grass
-					'images/grass-block.png',   //Grass
-					'images/water-block.png',   //Water
-					'images/grass-block.png',   //Grass
-					'images/grass-block.png',   //Grass
-					'images/grass-block.png',   //Grass                      
-				]
+		//Layout of the tiles for each level
+		if (level == 1) {
+			colImages = [
+				'images/water-block.png', //Water
+				'images/stone-block.png', //Stone
+				'images/stone-block.png', //Stone
+				'images/water-block.png', //Water
+				'images/grass-block.png', //Grass
+				'images/grass-block.png', //Grass
+				'images/water-block.png', //Water
+				'images/grass-block.png', //Grass
+				'images/grass-block.png', //Grass
+				'images/grass-block.png', //Grass
+			];
 
-		}else if(level==2){
-			var colImages = [
-					'images/grass-block.png',   //Grass 
-					'images/stone-block.png',   //Stone
-					'images/water-block.png',   //Water
-					'images/stone-block.png',   //Stone 
-					'images/stone-block.png',   //Stone  
-					'images/grass-block.png',   //Grass
-					'images/stone-block.png',   //Stone  
-					'images/grass-block.png',   //Grass   
-					'images/grass-block.png',   //Grass  
-					'images/water-block.png',   //Water                     
-				]
-		}else if(level==3){
-			var colImages = [
-					'images/stone-block.png',   //Stone  
-					'images/grass-block.png',   //Grass 
-					'images/grass-block.png',   //Grass 
-					'images/stone-block.png',   //Stone    
-					'images/stone-block.png',   //Stone      
-					'images/water-block.png',   //Water 
-					'images/water-block.png',   //Water    
-					'images/water-block.png',   //Water     
-					'images/grass-block.png',   //Grass     
-					'images/stone-block.png',   //Stone                        
-				]
+		} else if (level == 2) {
+			colImages = [
+				'images/grass-block.png', //Grass
+				'images/stone-block.png', //Stone
+				'images/water-block.png', //Water
+				'images/stone-block.png', //Stone
+				'images/stone-block.png', //Stone
+				'images/grass-block.png', //Grass
+				'images/stone-block.png', //Stone
+				'images/grass-block.png', //Grass
+				'images/grass-block.png', //Grass
+				'images/water-block.png', //Water
+			];
+		} else if (level == 3) {
+			colImages = [
+				'images/stone-block.png', //Stone
+				'images/grass-block.png', //Grass
+				'images/grass-block.png', //Grass
+				'images/stone-block.png', //Stone
+				'images/stone-block.png', //Stone
+				'images/water-block.png', //Water
+				'images/water-block.png', //Water
+				'images/water-block.png', //Water
+				'images/grass-block.png', //Grass
+				'images/stone-block.png', //Stone
+			];
 		}
-			   
+
 
 		/* Loop through the number of rows and columns we've defined above
-		 * and, using the rowImages array, draw the correct image for that
+		 * and, using the colImages array, draw the correct image for that
 		 * portion of the "grid"
 		 */
 		for (col = 0; col < numCols; col++) {
@@ -370,233 +371,259 @@ var Engine = (function(global) {
 		player.render();
 
 		//For loop to render each item in allCollectibleItems array
-		allCollectibleItems.forEach(function(item){
+		allCollectibleItems.forEach(function(item) {
 			item.render();
 		});
-		
+
 		//Render star (finish line)
 		star.render();
 	}
 
-	/* This function does nothing but it could have been a good place to
-	 * handle game reset states - maybe a new game menu or a game over screen
-	 * those sorts of things. It's only called once by the init() method.
-	 */
-	function reset() {
-		// Reset character's x and y coordinates to their initial values
-		player.x= initX;
-		player.y = initY;
-	}
-
 	//CUSTOM FUNCTIONALITY
 
-
-	//New level
+	/**
+	 * Function to handle everything related to moving on to the next level. It sets a variable for the current level's score
+	 * depending on the level the player currently in. It adds 1 to the variable "level" so the tile layout will update.
+	 * It sets the variable "score" for the new level to 0, then it checks each enemy in allEnemies array and if it moves
+	 * vertically, it assigns it a new random Y coordinate. Then it checks if any pair of enemies are overlapping.
+	 */
 	function nextLevel() {
-		//Set variable for the current level's score
-		if(level==1){
-			scoreLevel1= score;
-		}else if(level==2){
-			scoreLevel2= score;
-		}else if(level==3){ 
-			scoreLevel3= score;
+
+		if (level == 1) {
+			scoreLevel1 = score;
+		} else if (level == 2) {
+			scoreLevel2 = score;
+		} else if (level == 3) {
+			scoreLevel3 = score;
 		}
 
-		//Add 1 to variable "Level" 
 		level += 1;
 
-		//Reset score to 0
 		score = 0;
 
-		//Set vertical enemy's y coordinates to a random number between 50 and 700
-		allEnemies.forEach(function(enemy){                    
-			if(enemy.axis=="y"){
+		allEnemies.forEach(function(enemy) {
+			if (enemy.axis == 'y') {
 				enemy.y = generateRandomCoordY();
-			} 
-		})
+			}
+		});
 
-		//Check if any enemies are overlapping
 		checkEnemiesOverlapping();
 
+		/**
+		 * Checks if enemies are overlapping after random Y coordinates are generated. It checks each enemy in allEnemies array.
+		 * If the enemy is not the first in the array (there wouldn't be a previous enemy to compare it to), if it moves in the
+		 * "Y" axis and if it has the same "X" coordinate that the previous one (they are located in the same column) it checks if
+		 * the absolute value of the difference between the Y coordinate of the enemy being analyzed and the previous one is less than 250px
+		 * in any direction (Absolute value is used because the current enemy being analyze in the loop could be above the previous one or viceversa
+		 * since the new Y coordinates are random, and their subtraction could be negative or positive). If they are less than 250px apart, assign a new
+		 * random Y coordinate to the current enemy and check again, repeat the process until they are more than 250px apart.
+		 */
 		function checkEnemiesOverlapping() {
-			//For loop to check each enemy in allEnemies array
-			for(var i=0; i<allEnemies.length; i++){
-				//Generate a new Y coordinate if: the enemy is not the first element in the array, it moves in the "y" axis, 
-				// and if it has the same "x" coordinate than the previous one.
-				if(i>0 && allEnemies[i].axis=="y" && allEnemies[i].x==allEnemies[i-1].x){
-					//While they are less than 250px apart vertically, generate a new random Y coordinate
-					while(Math.abs(allEnemies[i].y-allEnemies[i-1].y)<250){
-						allEnemies[i].y= generateRandomCoordY();
+			for (var i = 0; i < allEnemies.length; i++) {
+				if (i > 0 && allEnemies[i].axis == 'y' && allEnemies[i].x == allEnemies[i - 1].x) {
+					while (Math.abs(allEnemies[i].y - allEnemies[i - 1].y) < 250) {
+						allEnemies[i].y = generateRandomCoordY();
 					}
 				}
 			}
 		}
-}
-
-	//Display counter
-	function countersDisplay() {
-		ctx.font ="24px Arial";
-		//Lives counter
-		ctx.fillText("Lives: "+ lives, 20, 20);
-		//Level counter
-		ctx.fillText("Level: "+ level, 150, 20);
-		//Score counter
-		ctx.fillText("Current level Score: "+ score, 260, 20);        
-		//Score needed counter
-		ctx.fillText("Score needed: "+ scoreNeeded, 560, 20);
-		//Total acumulated score
-		ctx.fillText("Total score: "+ totalScore, 800, 20);
 	}
 
-	//Update counters
-	function countersUpdate(){
-		//Clear a reactangle where the counters are located
-		ctx.clearRect(0,0,1200,300);
+	/**
+	 * Displays counters on the top of the screen
+	 */
+	function countersDisplay() {
+		ctx.font = '24px Arial';
+		//Lives counter
+		ctx.fillText('Lives: ' + lives, 20, 20);
+		//Level counter
+		ctx.fillText('Level: ' + level, 150, 20);
+		//Score counter
+		ctx.fillText('Current level Score: ' + score, 260, 20);
+		//Score needed counter
+		ctx.fillText('Score needed: ' + scoreNeeded, 560, 20);
+		//Total acumulated score
+		ctx.fillText('Total score: ' + totalScore, 800, 20);
+	}
 
+	/**
+	 * Updates counters on the top of the screen. It clears a rectangle in the canvas where the counters are located
+	 * updates the scores and variables and then it displays the counters again with the updated values.
+	 */
+	function countersUpdate() {
+		ctx.clearRect(0, 0, 1200, 300);
 		updateScores();
-
-		//Display them again with their updated values
 		countersDisplay();
 	}
 
+	/**
+	 * Updates scores displayed on the counters.
+	 */
 	function updateScores() {
-		//Set a minumum score to pass the level
-		if(level==1){
-			minScoreToPass = 110;
-		}else if(level==2){
-			minScoreToPass = 210;
-		}else if(level==3){
-			minScoreToPass = 410;
+
+		setMinScore();
+		updateScoreNeeded();
+		setTotalScore();
+
+		/**
+		 * Sets a minimum score to pass each level
+		 */
+		function setMinScore(){
+			if (level == 1) {
+				minScoreToPass = 110;
+			} else if (level == 2) {
+				minScoreToPass = 210;
+			} else if (level == 3) {
+				minScoreToPass = 410;
+			}
 		}
 
-		// Update the score the player has to collect to reach the minimium score to pass the level
-		if(minScoreToPass - score>0){
-			scoreNeeded = minScoreToPass - score;
-		// If scoreNeeded will be less than 0, set it to 0
-		}else if(minScoreToPass - score<=0){
-			scoreNeeded = 0;
+		/**
+		 * Updates the score the player has to collect to reach the minimum score to pass to level and if the
+		 * player keeps collecting items and increasing the score beyond the minimum requirement, sets the needed score to pass the level
+		 * to 0.
+		 */
+		function updateScoreNeeded(){
+			// Update the score the player has to collect to reach the minimium score to pass the level
+			if (minScoreToPass - score > 0) {
+				scoreNeeded = minScoreToPass - score;
+			// If scoreNeeded will be less than 0, set it to 0
+			} else if (minScoreToPass - score <= 0) {
+				scoreNeeded = 0;
+			}
 		}
 
-		//Set the value for totalScore (On level1, it updates automatically through "score", 
-		//in level 2 and 3 it depends on "score" and the previous levels score)
-		if(level==1){
-			totalScore= score;
-		}else if(level==2){
-			totalScore = score + scoreLevel1
-		}else if(level==3){
-			totalScore = score + scoreLevel1 + scoreLevel2;
+		/**
+		 * Sets the value for the total score counter according to the player's current level
+		 */
+		function setTotalScore(){
+			if (level == 1) {
+				totalScore = score;
+			} else if (level == 2) {
+				totalScore = score + scoreLevel1;
+			} else if (level == 3) {
+				totalScore = score + scoreLevel1 + scoreLevel2;
+			}
 		}
 	}
 
-	function resetCounters(){
-		lives= 10;
-		score= 0; 
-		level= 1;
-		totalScore= 0;
-		scoreNeeded= 110;
+	/*
+	 * Resets counters
+	 */
+	function resetCounters() {
+		lives = 10;
+		score = 0;
+		level = 1;
+		totalScore = 0;
+		scoreNeeded = 110;
 	}
 
-	//Encapsulating events trigerred by winning or losing
-
-
-	//Game over function
-	function gameOver(){
-		//Play sound
+	/**
+	 * Stops the game engine, plays a sound, shows a game over screen and adds an event listener for the user to click
+	 * anywhere on the screen to restart the game. If the user clicks on the screen,
+	 * an event listener handles the execution of screenclick function that restarts the game engine
+	 */
+	function gameOver() {
 		playYouLostSound();
+		setGameOverCanvas();
 
-		//Variables
-		var mainTitleY= canvas.height/2;
+		/**
+		 * Sets canvas properties and text for "game over" screen
+		 */
+		function setGameOverCanvas() {
+			var mainTitleY = canvas.height / 2;
 
-		//To update the counter
-		ctx.clearRect(0,0,1000,50);
+			//To update the counter
+			ctx.clearRect(0, 0, 1000, 50);
 
-		//Text attributes
-		ctx.font= "bold 60px Arial";
-		ctx.fillStyle= "red";
-		ctx.shadowColor= "black";
-		ctx.shadowOffsetY= 5;
+			ctx.font = 'bold 60px Arial';
+			ctx.fillStyle = 'red';
+			ctx.shadowColor = 'black';
+			ctx.shadowOffsetY = 5;
 
-		ctx.fillText("GAME OVER", 60, mainTitleY);
+			ctx.fillText('GAME OVER', 60, mainTitleY);
 
-		ctx.font="30px Arial";
-		ctx.shadowOffsetY= 2;
-		ctx.fillText("Click anywhere to start again", 60, mainTitleY+40);
-
-		//Execute a function to reset and restart game after "game over"
-		document.addEventListener("click", gameOverClick); 
-
-		//If the user clicks anywhere on the page, the game starts again
-		function gameOverClick(){
-			//Reset counters values
-			resetCounters();
-			//Reset shadow attributes
-			ctx.shadowColor= "transparent";
-			ctx.fillStyle= "black";
-			init();
-			//Remove click event so when user clicks the canvas after a "game over" event, the game won't restart
-			document.removeEventListener("click", gameOverClick);
-		}			
-	}
-
-	//YOU WIN function
-	function youWin(){
-
-		//Play sound if player wins
-		playYouWinSound();
-
-		renderEntities();
-		
-		//Variables
-		var mainTitleY= canvas.height/2;
-
-		//To update the counter
-		ctx.clearRect(0,0,1000,50);
-
-		//Text attributes
-		ctx.font= "bold 60px Arial";
-		ctx.fillStyle= "purple";
-		ctx.shadowColor= "black";
-		ctx.shadowOffsetY= 5;
-
-		ctx.fillText("YOU WIN! Your score is: "+ score, 80, mainTitleY);
-
-		ctx.font="30px Arial";
-		ctx.shadowOffsetY= 2;
-		ctx.fillText("Click anywhere to play again", canvas.width/3, mainTitleY+40);
-
-		//Execute a function to reset and restart game after "game over"
-		document.addEventListener("click", youWinClick);
-
-		//If the user clicks anywhere on the page, the game starts again
-		function youWinClick(){
-			//Reset counters values
-			resetCounters();
-			//Reset shadow attributes
-			ctx.shadowColor= "transparent";
-			ctx.fillStyle= "black";
-			starCollision = false;
-			init();
-
-			//Remove click event so when user clicks the canvas after a "game over" event, the game won't restart
-			document.removeEventListener("click", youWinClick);
+			ctx.font = '30px Arial';
+			ctx.shadowOffsetY = 2;
+			ctx.fillText('Click anywhere to start again', 60, mainTitleY + 40);
 		}
 
-		
+		document.addEventListener('click', screenclick);
+	}
+
+	/**
+	 * Stops the game engine when the player wins, shows a "you win screen" with the total score and adds
+	 * an event listener for the user to click to restart the game. If the user clicks on the screen,
+	 * an event listener handles the execution of screenclick function that restarts the game engine
+	 */
+	function youWin() {
+		playYouWinSound();
+		renderEntities();
+		setYouWinCanvas();
+
+		/**
+		 * Sets the canvas properties and text for "you win" screen
+		 */
+		function setYouWinCanvas() {
+			var mainTitleY = canvas.height / 2;
+
+			//Update the counter
+			ctx.clearRect(0, 0, 1000, 50);
+
+			ctx.font = 'bold 60px Arial';
+			ctx.fillStyle = 'purple';
+			ctx.shadowColor = 'black';
+			ctx.shadowOffsetY = 5;
+
+			ctx.fillText('YOU WIN! Your score is: ' + score, 80, mainTitleY);
+
+			ctx.font = '30px Arial';
+			ctx.shadowOffsetY = 2;
+			ctx.fillText('Click anywhere to play again', canvas.width / 3, mainTitleY + 40);
+		}
+
+		document.addEventListener('click', screenclick);
+	}
+
+	/**
+	 * Resets counters, resets shadow attributes, sets starCollission to false to make the game engine start again
+	 * and removes the event listener after the function has executed (otherwise, the event listener will remain
+	 * active and if the player clicks on the screen, the game will restart)
+	 */
+	function screenclick() {
+			resetCounters();
+
+			ctx.shadowColor = 'transparent';
+			ctx.fillStyle = 'black';
+			starCollision = false;
+
+			init();
+			document.removeEventListener('click', screenclick);
 	}
 
 	//ENCAPSULATING SOUND EFFECTS
-	function playYouWinSound(){
-		var winAudio = new Audio("sounds/round_end.wav");
+
+	/**
+	 * Plays sound if player won
+	 */
+	function playYouWinSound() {
+		var winAudio = new Audio('sounds/round_end.wav');
 		winAudio.play();
 	}
 
-	function playYouLostSound(){
-		var lostAudio = new Audio("sounds/death.wav");
+	/**
+	 * Plays sound if player lost
+	 */
+	function playYouLostSound() {
+		var lostAudio = new Audio('sounds/death.wav');
 		lostAudio.play();
 	}
 
-	function playInitSound(){
-		var initAudio = new Audio("sounds/Accept.mp3");
+	/**
+	 * Plays sound every time the game starts and when the player moves on to the next level
+	 */
+	function playInitSound() {
+		var initAudio = new Audio('sounds/Accept.mp3');
 		initAudio.play();
 	}
 
