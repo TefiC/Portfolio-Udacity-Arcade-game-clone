@@ -168,7 +168,7 @@ var enemy3 = new Spider(300, 40, fast, 'y');   //Fourth col
 
 var enemy4 = new Frog(400, 60, medium, 'y');   //Fifth col
 var enemy5 = new Snake(400, 370, medium, 'y'); //Fifth col
-var enemy6 = new Spider(500, 50, slow, 'y');   //Sixth row
+var enemy6 = new Spider(500, 50, slow, 'y');   //Sixth col
 var enemy7 = new Bug(500, 380, slow, 'y');     //Sixth col
 var enemy8 = new Frog(600, 60, fast, 'y');     //Seventh col
 var enemy9 = new Bug(700, 80, slow, 'y');      //Eighth col
