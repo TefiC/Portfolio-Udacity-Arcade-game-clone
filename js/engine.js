@@ -95,7 +95,7 @@ var Engine = (function(global) {
 		if (lives > 0 && starCollision === false) {
 			//Still alive
 			win.requestAnimationFrame(main);
-		}else if (starCollision === true) {
+		}else if (lives>0 && starCollision === true) {
 			youWin();
 		}else {
 			gameOver();
@@ -143,16 +143,11 @@ var Engine = (function(global) {
 		allEnemies.forEach(function(enemy) {
 			enemy.update(dt);
 		});
-
-		//Update player
-		player.update();
 	}
-
-	//COLLISION DETECTION
 
 	/**
 	 * Checks collision between the player and enemies, collectible items and the finish line (Star).
-	 * First, I make a box that surrounds the player and then execute three separate functions to check each collisions with each one.
+	 * Excutes three functions to check each collisions with each one.
 	 */
 	function checkCollisions() {
 
@@ -166,10 +161,6 @@ var Engine = (function(global) {
 		checkCollisionEnemy();
 		checkCollisionStar();
 		checkCollisionItems();
-
-		//FUNCTIONS TO CHECK COLLISION
-
-			//ENEMIES
 
 		/**
 		 * Checks collision between the player and enemies. A for loop checks each enemy in allEnemies array, creating a "box"
@@ -206,8 +197,6 @@ var Engine = (function(global) {
 			});
 		}
 
-		//STAR
-
 		/**
 		 * Checks collision between the player and the Star. It creates a "box" that surrounds the star, then checks if the
 		 * conditions for collision between the player's box and the star's box are true. If so, if the player is on level 1,
@@ -237,8 +226,6 @@ var Engine = (function(global) {
 			}
 		}
 
-		//COLLECTIBLE ITEMS
-
 		/**
 		 * Checks collision between the player and Collectible items. Creates a "box" that surrounds the collectible item,
 		 * then it checks if the condition for collision between the player's box and the collectible item's box is true.
@@ -257,15 +244,11 @@ var Engine = (function(global) {
 					'height': 40
 				};
 
-				//Set condition for collision with collectible item
 				if (itemBox.x < playerBox.x + playerBox.width && itemBox.x + itemBox.width > playerBox.x && itemBox.y < playerBox.y + playerBox.height && itemBox.height + itemBox.y > playerBox.y) {
-					//If the item is a leaf, add 5 to the score
 					if (item.description == 'leaf') {
 						score += 5;
-					//If its a cherry, add 10 to the score
 					} else if (item.description == 'cherry') {
 						score += 10;
-					//If its a gem, add 30 to the score
 					} else if (item.description == 'gem') {
 						score += 30;
 					}
@@ -289,7 +272,7 @@ var Engine = (function(global) {
 		var row, col;
 		var colImages;
 
-		//Layout of the tiles for each level
+		//Tile layout for each level
 		if (level == 1) {
 			colImages = [
 				'images/water-block.png', //Water
@@ -350,7 +333,7 @@ var Engine = (function(global) {
 			}
 		}
 
-		//General function to display all counters
+		//Function to display all counters
 		countersDisplay();
 
 		renderEntities();
@@ -379,13 +362,16 @@ var Engine = (function(global) {
 		star.render();
 	}
 
-	//CUSTOM FUNCTIONALITY
+	//Custom functionality
 
 	/**
 	 * Function to handle everything related to moving on to the next level. It sets a variable for the current level's score
-	 * depending on the level the player currently in. It adds 1 to the variable "level" so the tile layout will update.
+	 * depending on the current level. It adds 1 to the variable "level" so the tile layout will update.
 	 * It sets the variable "score" for the new level to 0, then it checks each enemy in allEnemies array and if it moves
-	 * vertically, it assigns it a new random Y coordinate. Then it checks if any pair of enemies are overlapping.
+	 * vertically, it assigns it a new random Y coordinate. Then it generates a new Y coordinate for each enemy, making sure that
+	 * they don't overlap by checking if the columns have more than one vertical enemy. If that's the case, one enemy gets assigned a
+	 * Y coordinate on the top half of the canvas while the next one gets assigned a Y coordinate at the bottom half of the canvas,
+	 * making sure they don't overlap.
 	 */
 	function nextLevel() {
 
@@ -401,27 +387,33 @@ var Engine = (function(global) {
 
 		score = 0;
 
-		allEnemies.forEach(function(enemy) {
-			if (enemy.axis == 'y') {
-				enemy.y = generateRandomCoordY();
-			}
-		});
-
-		checkEnemiesOverlapping();
+		newEnemyLocation();
 
 		/**
-		 * Checks if enemies are overlapping after random Y coordinates are generated. It checks each enemy in allEnemies array.
-		 * If the enemy is not the first in the array (there wouldn't be a previous enemy to compare it to), if it moves in the
-		 * "Y" axis and if it has the same "X" coordinate that the previous one (they are located in the same column) it checks if
-		 * the absolute value of the difference between the Y coordinate of the enemy being analyzed and the previous one is less than 250px
-		 * in any direction (Absolute value is used because the current enemy being analyze in the loop could be above the previous one or viceversa
-		 * since the new Y coordinates are random, and their subtraction could be negative or positive). If they are less than 250px apart, assign a new
-		 * random Y coordinate to the current enemy and check again, repeat the process until they are more than 250px apart.
-		 */
-		function checkEnemiesOverlapping() {
-			for (var i = 0; i < allEnemies.length; i++) {
-				if (i > 0 && allEnemies[i].axis == 'y' && allEnemies[i].x == allEnemies[i - 1].x) {
-					while (Math.abs(allEnemies[i].y - allEnemies[i - 1].y) < 250) {
+		* Function to generate and assign a new random Y coordinate for enemies once the player moves on to the next
+		* level. It loops through allEnemies array and checks if the enemy being analyzed is the first enemy
+		* in the array, if that's the case, it generate a random Y coordinate within the top half of the canvas,
+		* and assigns it to the enemy's Y coordinate.
+		* If the enemy being analyzed is not the first in the array, and if it moves in the Y axis,
+		* it checks certain conditions: The first condition checks if there is more than one enemy is that column,
+		* and if the enemy is the first one in the array located in that column. If that's the case, it generates a new
+		* random Y coordinate for the enemy within the top half of the canvas. The second condition also checks if there
+		* is more than one enemy in that column and if the enemy is the second one in that column. If that's the case,
+		* it generate a new Y coordinate for the enemy within the bottom half of the canvas. Else, if the ennemy is the
+		* only one in the column, it generates a random Y coordinate within the whole range of the canvas height.
+		*/
+		function newEnemyLocation() {
+			for (var i=0; i<allEnemies.length; i++){
+
+				if (allEnemies[i].axis=='y' && i==0){
+					allEnemies[i].y = generateRandomTopCoordY();
+
+				}else if(allEnemies[i].axis=='y' && i>0) {
+					if(allEnemies[i].x==allEnemies[i+1].x){
+						allEnemies[i].y = generateRandomTopCoordY();
+					}else if(allEnemies[i].x==allEnemies[i-1].x){
+						allEnemies[i].y = generateRandomBottomCoordY();
+					}else{
 						allEnemies[i].y = generateRandomCoordY();
 					}
 				}
@@ -447,7 +439,7 @@ var Engine = (function(global) {
 	}
 
 	/**
-	 * Updates counters on the top of the screen. It clears a rectangle in the canvas where the counters are located
+	 * Updates counters on the top of the screen. It clears a rectangle in the canvas where the counters are located,
 	 * updates the scores and variables and then it displays the counters again with the updated values.
 	 */
 	function countersUpdate() {
@@ -480,14 +472,11 @@ var Engine = (function(global) {
 
 		/**
 		 * Updates the score the player has to collect to reach the minimum score to pass to level and if the
-		 * player keeps collecting items and increasing the score beyond the minimum requirement, sets the needed score to pass the level
-		 * to 0.
+		 * player keeps collecting items and increasing the score beyond the minimum requirement, sets it to 0.
 		 */
 		function updateScoreNeeded(){
-			// Update the score the player has to collect to reach the minimium score to pass the level
 			if (minScoreToPass - score > 0) {
 				scoreNeeded = minScoreToPass - score;
-			// If scoreNeeded will be less than 0, set it to 0
 			} else if (minScoreToPass - score <= 0) {
 				scoreNeeded = 0;
 			}
@@ -508,7 +497,7 @@ var Engine = (function(global) {
 	}
 
 	/*
-	 * Resets counters
+	 * Resets counters to their initial values
 	 */
 	function resetCounters() {
 		lives = 10;
@@ -521,7 +510,7 @@ var Engine = (function(global) {
 	/**
 	 * Stops the game engine, plays a sound, shows a game over screen and adds an event listener for the user to click
 	 * anywhere on the screen to restart the game. If the user clicks on the screen,
-	 * an event listener handles the execution of screenclick function that restarts the game engine
+	 * an event listener handles the execution of the "screenclick" function that restarts the game engine
 	 */
 	function gameOver() {
 		playYouLostSound();
@@ -554,7 +543,7 @@ var Engine = (function(global) {
 	/**
 	 * Stops the game engine when the player wins, shows a "you win screen" with the total score and adds
 	 * an event listener for the user to click to restart the game. If the user clicks on the screen,
-	 * an event listener handles the execution of screenclick function that restarts the game engine
+	 * an event listener handles the execution of "screenclick" function that restarts the game engine
 	 */
 	function youWin() {
 		playYouWinSound();
@@ -588,7 +577,7 @@ var Engine = (function(global) {
 	/**
 	 * Resets counters, resets shadow attributes, sets starCollission to false to make the game engine start again
 	 * and removes the event listener after the function has executed (otherwise, the event listener will remain
-	 * active and if the player clicks on the screen, the game will restart)
+	 * active and if the player clicks on the screen, the game will restart).
 	 */
 	function screenclick() {
 			resetCounters();
@@ -601,10 +590,10 @@ var Engine = (function(global) {
 			document.removeEventListener('click', screenclick);
 	}
 
-	//ENCAPSULATING SOUND EFFECTS
+	//Sound effects
 
 	/**
-	 * Plays sound if player won
+	 * Plays sound
 	 */
 	function playYouWinSound() {
 		var winAudio = new Audio('sounds/round_end.wav');
@@ -612,7 +601,7 @@ var Engine = (function(global) {
 	}
 
 	/**
-	 * Plays sound if player lost
+	 * Plays sound
 	 */
 	function playYouLostSound() {
 		var lostAudio = new Audio('sounds/death.wav');
@@ -620,7 +609,7 @@ var Engine = (function(global) {
 	}
 
 	/**
-	 * Plays sound every time the game starts and when the player moves on to the next level
+	 * Plays sound
 	 */
 	function playInitSound() {
 		var initAudio = new Audio('sounds/Accept.mp3');

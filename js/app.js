@@ -20,8 +20,6 @@ var Enemy = function(x, y, speed, axis) {
     this.axis = axis;
 };
 
-//PSEUDOCLASSICAL SUBCLASSES FOR DIFFERENT TYPES OF ENEMIES
-
 /**
  * Represents a Bug
  * @constructor
@@ -109,7 +107,7 @@ Frog.prototype.constructor= Frog;
 
 
 /**
- * Method to update the enemy's position so make it move on the canvas. First, it determines if
+ * Method to update the enemy's position to make it move on the canvas. First, it determines if
  * the enemy moves horizontally or vertically and then it updates the corresponding coordinate. If the enemy
  * reaches a specific breakpoint (>700px if it moves vertically and >900px if it moves horizontally)
  * it resets the enemy's location to its initial coordinates.
@@ -168,7 +166,7 @@ var enemy3 = new Spider(300, 40, fast, 'y');   //Fourth col
 
 var enemy4 = new Frog(400, 60, medium, 'y');   //Fifth col
 var enemy5 = new Snake(400, 370, medium, 'y'); //Fifth col
-var enemy6 = new Spider(500, 50, slow, 'y');   //Sixth row
+var enemy6 = new Spider(500, 50, slow, 'y');   //Sixth col
 var enemy7 = new Bug(500, 380, slow, 'y');     //Sixth col
 var enemy8 = new Frog(600, 60, fast, 'y');     //Seventh col
 var enemy9 = new Bug(700, 80, slow, 'y');      //Eighth col
@@ -231,8 +229,8 @@ Player.prototype.render = function() {
 
 /**
  * Method to handle keyboard input and move the player around with varying speeds depending on the surface its in,
- * (stone, grass or water). Check the input and then call the player's update method to update
- * the character's location on the screen.
+ * (stone, grass or water). Checks the input and then calls the player's update method to update
+ * the character's location on the screen every time a key is pressed
  * @param {string} key - description of the key pressed on the keyboard
  * @param {number} currentLevel
  */
@@ -306,26 +304,39 @@ document.addEventListener('keyup', function(e) {
     player.handleInput(allowedKeys[e.keyCode], level);
 });
 
-
-//Generate random coordinates
-
 /**
- * Generates a random X coordinate between 50px and 800px
+ * Generates a random X coordinate withing a range
+ * @returns {number} A random number between 50 (inclusive) and 800 (exclusive)
  */
 var generateRandomCoordX = function() {
     return Math.random() * (800 - 50) + 50;
 };
 
 /**
- * Generates a random Y coordinate between 50px and 700px
+ * Generates a random Y coordinate within a range
+ * @returns {number} A random number between 50 (inclusive) and 700 (exclusive)
  */
 var generateRandomCoordY = function() {
     return Math.random() * (700 - 50) + 50;
 };
 
-//COLLECTIBLE ITEMS
+/**
+* Generates a new Y coordinate within the top half of the canvas
+* @returns {number} A random number between 90 and 180
+*/
+var generateRandomTopCoordY = function() {
+    return Math.floor(Math.random() * (180 - 90 + 1)) + 90;
+};
 
-//Superclass for collectible items
+/**
+* Generates a new Y coordinate within the bottom half of the canvas
+* @returns {number} A random number between 400 and 450
+*/
+var generateRandomBottomCoordY = function() {
+    return Math.floor(Math.random() * (450 - 400 + 1)) + 400;
+};
+
+//COLLECTIBLE ITEMS
 
 /**
  * Represents a Collectible Item
@@ -345,8 +356,12 @@ CollectibleItem.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y, this.width, this.height);
 };
 
+/**
+* Method to update a Collectible item's coordinates when the player collects them.
+* It generates random X and Y coordinates and assigns it to the collectible item's
+* X and Y coordinates.
+*/
 CollectibleItem.prototype.update = function() {
-    //After collision, generate random X and Y coordinates for the item
     this.x = generateRandomCoordX();
     this.y = generateRandomCoordY();
 };
