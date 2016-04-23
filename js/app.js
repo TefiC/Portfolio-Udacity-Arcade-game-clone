@@ -14,10 +14,10 @@
  * @param {string} axis  - axis on which the enemy will move
  */
 var Enemy = function(x, y, speed, axis) {
-    this.x = x;
-    this.y = y;
-    this.speed = speed;
-    this.axis = axis;
+	this.x = x;
+	this.y = y;
+	this.speed = speed;
+	this.axis = axis;
 };
 
 /**
@@ -29,15 +29,15 @@ var Enemy = function(x, y, speed, axis) {
  * @param {string} axis  - axis on which the bug will move
  */
 var Bug = function(x, y, speed, axis) {
-    //Sprite
-    if (axis == 'y') {
-        this.sprite = 'images/enemy-bug-vertical.png';
-    } else {
-        this.sprite = 'images/enemy-bug-horizontal.png';
-    }
-    this.description = 'bug';
-    //Call superclass
-    Enemy.call(this, x, y, speed, axis);
+	//Sprite
+	if (axis == 'y') {
+		this.sprite = 'images/enemy-bug-vertical.png';
+	} else {
+		this.sprite = 'images/enemy-bug-horizontal.png';
+	}
+	this.description = 'bug';
+	//Call superclass
+	Enemy.call(this, x, y, speed, axis);
 };
 
 //Delegate failed lookups in Bug.prototype to Enemy.prototype (Subclass prototype delegation)
@@ -54,10 +54,10 @@ Bug.prototype.constructor= Bug;
  * @param {string} axis  - axis on which the spider will move
  */
 var Spider = function(x, y, speed, axis) {
-    this.sprite = 'images/spider.png';
-    this.description = 'spider';
-    //Call superclass
-    Enemy.call(this, x, y, speed, axis);
+	this.sprite = 'images/spider.png';
+	this.description = 'spider';
+	//Call superclass
+	Enemy.call(this, x, y, speed, axis);
 };
 
 //Delegate failed lookups in Spider.prototype to Enemy.prototype (Subclass prototype delegation)
@@ -74,10 +74,10 @@ Spider.prototype.constructor= Spider;
  * @param {string} axis  - axis on which the snake will move
  */
 var Snake = function(x, y, speed, axis) {
-    this.sprite = 'images/snake-ver.png';
-    this.description = 'snake';
-    //Call superclass
-    Enemy.call(this, x, y, speed, axis);
+	this.sprite = 'images/snake-ver.png';
+	this.description = 'snake';
+	//Call superclass
+	Enemy.call(this, x, y, speed, axis);
 };
 
 //Delegate failed lookups in Snake.prototype to Enemy.prototype (Subclass prototype delegation)
@@ -94,10 +94,10 @@ Snake.prototype.constructor= Snake;
  * @param {string} axis  - axis on which the frog will move
  */
 var Frog = function(x, y, speed, axis) {
-    this.sprite = 'images/frog.png';
-    this.description = 'frog';
-    //Call superclass
-    Enemy.call(this, x, y, speed, axis);
+	this.sprite = 'images/frog.png';
+	this.description = 'frog';
+	//Call superclass
+	Enemy.call(this, x, y, speed, axis);
 };
 
 //Delegate failed lookups in Frog.prototype to Enemy.prototype (Subclass prototype delegation)
@@ -114,17 +114,19 @@ Frog.prototype.constructor= Frog;
  * @param {number} dt - delta time between ticks to ensure the game runs at the same speed for all computers
  */
 Enemy.prototype.update = function(dt) {
-    if (this.axis == 'y') {
-        this.y = this.y + (this.speed * dt);
-        if (this.y > 700) {
-            this.reset();
-        }
-    } else {
-        this.x = this.x + (this.speed * dt);
-        if (this.x > 900) {
-            this.reset();
-        }
-    }
+	var delta = this.speed * dt;
+
+	if (this.axis == 'y') {
+		this.y = this.y + delta;
+		if (this.y > 700) {
+			this.reset();
+		}
+	} else {
+		this.x = this.x + delta;
+		if (this.x > 900) {
+			this.reset();
+		}
+	}
 };
 
 /**
@@ -132,11 +134,11 @@ Enemy.prototype.update = function(dt) {
  * the end of the canvas (vertically or horizontally)
  */
 Enemy.prototype.reset = function() {
-    if (this.axis == 'y') {
-        this.y = 50;
-    } else {
-        this.x = 800;
-    }
+	if (this.axis == 'y') {
+		this.y = 50;
+	} else {
+		this.x = 800;
+	}
 };
 
 /**
@@ -144,11 +146,11 @@ Enemy.prototype.reset = function() {
  * keep its original width and height, if not, set a specific width (100px) and height (100px).
  */
 Enemy.prototype.render = function() {
-    if (this.description == 'bug') {
-        ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-    } else {
-        ctx.drawImage(Resources.get(this.sprite), this.x, this.y, 100, 100);
-    }
+	if (this.description == 'bug') {
+		ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+	} else {
+		ctx.drawImage(Resources.get(this.sprite), this.x, this.y, 100, 100);
+	}
 };
 
 //ENEMY INSTANCES
@@ -189,9 +191,9 @@ var allEnemies = [enemy1, enemy2, enemy3, enemy4, enemy5, enemy6, enemy7, enemy8
  * @param {number} y - Y coordinate
  */
 var Player = function(x, y) {
-    this.sprite = 'images/ant.png';
-    this.x = x;
-    this.y = y;
+	this.sprite = 'images/ant.png';
+	this.x = x;
+	this.y = y;
 };
 
 /**
@@ -201,30 +203,30 @@ var Player = function(x, y) {
  * @param {number} speed - the player's speed in that particular terrain (stone, water, grass)
  */
 Player.prototype.update = function(key, speed) {
-    if (key == 'left') {
-        if (!(this.x - speed < 0)) {
-            this.x -= speed;
-        }
-    } else if (key == 'right') {
-        if (!(this.x + speed > 900)) {
-            this.x += speed;
-        }
-    } else if (key == 'up') {
-        if (!(this.y - speed < 23)) {
-            this.y -= speed;
-        }
-    } else if (key == 'down') {
-        if (!(this.y + speed > 700)) {
-            this.y += speed;
-        }
-    }
+	if (key == 'left') {
+		if (this.x - speed > 0) {
+			this.x -= speed;
+		}
+	} else if (key == 'right') {
+		if (this.x + speed < 900) {
+			this.x += speed;
+		}
+	} else if (key == 'up') {
+		if (this.y - speed > 23) {
+			this.y -= speed;
+		}
+	} else if (key == 'down') {
+		if (this.y + speed < 700) {
+			this.y += speed;
+		}
+	}
 };
 
 /**
  * Method to render player on the screen
  */
 Player.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y, 80, 100);
+	ctx.drawImage(Resources.get(this.sprite), this.x, this.y, 80, 100);
 };
 
 /**
@@ -235,55 +237,55 @@ Player.prototype.render = function() {
  * @param {number} currentLevel
  */
 Player.prototype.handleInput = function(key, currentLevel) {
-    //Varying player speeds according to the surface in the corresponding level
-    var speed;
-    //For level 1
-    if (currentLevel == 1) {
-        //Stone
-        if (this.x > 50 && this.x < 220) {
-            speed = 70;
-        //Grass
-        } else if (this.x > 350 && this.x < 550 || this.x > 600) {
-            speed = 45;
-        //Water
-        } else {
-            speed = 25;
-        }
-    //For level 2
-    } else if (currentLevel == 2) {
-        //Stone
-        if (this.x > 60 && this.x < 170 || this.x > 240 && this.x < 450 || this.x > 520 && this.x < 650) {
-            speed = 85;
-        //Grass
-        } else if (this.x < 60 || this.x > 450 && this.x < 520 || this.x > 650 && this.x < 850) {
-            speed = 55;
-        //Water
-        } else {
-            speed = 35;
-        }
-    //For level 3
-    } else if (currentLevel == 3) {
-        //Stone
-        if (this.x < 30 || this.x > 250 && this.x < 450 || this.x > 800) {
-            speed = 80;
-        //Grass
-        } else if (this.x > 30 && this.x < 250 || this.x > 800 && this.x < 900) {
-            speed = 65;
-        //Water
-        } else {
-            speed = 30;
-        }
-    }
+	//Varying player speeds according to the surface in the corresponding level
+	var speed;
+	//For level 1
+	if (currentLevel == 1) {
+		//Stone
+		if (this.x > 50 && this.x < 220) {
+			speed = 70;
+		//Grass
+		} else if (this.x > 350 && this.x < 550 || this.x > 600) {
+			speed = 45;
+		//Water
+		} else {
+			speed = 25;
+		}
+	//For level 2
+	} else if (currentLevel == 2) {
+		//Stone
+		if (this.x > 60 && this.x < 170 || this.x > 240 && this.x < 450 || this.x > 520 && this.x < 650) {
+			speed = 85;
+		//Grass
+		} else if (this.x < 60 || this.x > 450 && this.x < 520 || this.x > 650 && this.x < 850) {
+			speed = 55;
+		//Water
+		} else {
+			speed = 35;
+		}
+	//For level 3
+	} else if (currentLevel == 3) {
+		//Stone
+		if (this.x < 30 || this.x > 250 && this.x < 450 || this.x > 800) {
+			speed = 80;
+		//Grass
+		} else if (this.x > 30 && this.x < 250 || this.x > 800 && this.x < 900) {
+			speed = 65;
+		//Water
+		} else {
+			speed = 30;
+		}
+	}
 
-    this.update(key, speed);
+	this.update(key, speed);
 };
 
 /**
  * Method to reset the player's coordinates.
  */
 Player.prototype.reset = function() {
-    this.x = 100;
-    this.y = 650;
+	this.x = 100;
+	this.y = 650;
 };
 
 //PLAYER INSTANCE
@@ -295,29 +297,29 @@ var player = new Player(100, 650);
 // This listens for key presses and sends the keys to the
 // Player.handleInput() method.
 document.addEventListener('keyup', function(e) {
-    var allowedKeys = {
-        37: 'left',
-        38: 'up',
-        39: 'right',
-        40: 'down',
-    };
-    player.handleInput(allowedKeys[e.keyCode], level);
+	var allowedKeys = {
+		37: 'left',
+		38: 'up',
+		39: 'right',
+		40: 'down',
+	};
+	player.handleInput(allowedKeys[e.keyCode], level);
 });
 
 /**
  * Generates a random X coordinate withing a range
- * @returns {number} A random number between 50 (inclusive) and 800 (exclusive)
+ * @returns {number} A random number between 50 (included) and 800 (excluded)
  */
 var generateRandomCoordX = function() {
-    return Math.random() * (800 - 50) + 50;
+	return Math.random() * (800 - 50) + 50;
 };
 
 /**
  * Generates a random Y coordinate within a range
- * @returns {number} A random number between 50 (inclusive) and 700 (exclusive)
+ * @returns {number} A random number between 50 (included) and 700 (excluded)
  */
 var generateRandomCoordY = function() {
-    return Math.random() * (700 - 50) + 50;
+	return Math.random() * (700 - 50) + 50;
 };
 
 /**
@@ -325,7 +327,7 @@ var generateRandomCoordY = function() {
 * @returns {number} A random number between 90 and 180
 */
 var generateRandomTopCoordY = function() {
-    return Math.floor(Math.random() * (180 - 90 + 1)) + 90;
+	return Math.floor(Math.random() * (180 - 90 + 1)) + 90;
 };
 
 /**
@@ -333,7 +335,7 @@ var generateRandomTopCoordY = function() {
 * @returns {number} A random number between 400 and 450
 */
 var generateRandomBottomCoordY = function() {
-    return Math.floor(Math.random() * (450 - 400 + 1)) + 400;
+	return Math.floor(Math.random() * (450 - 400 + 1)) + 400;
 };
 
 //COLLECTIBLE ITEMS
@@ -345,15 +347,15 @@ var generateRandomBottomCoordY = function() {
  * @param {number} y - Y coordinate
  */
 var CollectibleItem = function(x, y) {
-    this.x = x;
-    this.y = y;
+	this.x = x;
+	this.y = y;
 };
 
 /**
  * Method to render Collectible item on the screen
  */
 CollectibleItem.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y, this.width, this.height);
+	ctx.drawImage(Resources.get(this.sprite), this.x, this.y, this.width, this.height);
 };
 
 /**
@@ -362,8 +364,8 @@ CollectibleItem.prototype.render = function() {
 * X and Y coordinates.
 */
 CollectibleItem.prototype.update = function() {
-    this.x = generateRandomCoordX();
-    this.y = generateRandomCoordY();
+	this.x = generateRandomCoordX();
+	this.y = generateRandomCoordY();
 };
 
 
@@ -376,12 +378,12 @@ CollectibleItem.prototype.update = function() {
  * @param {number} y - Y coordinate
  */
 var Leaf = function(x, y) {
-    this.sprite = 'images/leaf.png';
-    this.description = 'leaf';
-    this.width = 70;
-    this.height = 70;
-    //Call superclass
-    CollectibleItem.call(this, x, y);
+	this.sprite = 'images/leaf.png';
+	this.description = 'leaf';
+	this.width = 70;
+	this.height = 70;
+	//Call superclass
+	CollectibleItem.call(this, x, y);
 };
 
 //Delegate failed lookups in Leaf.prototype to CollectibleItem.prototype (Subclass prototype delegation)
@@ -406,12 +408,12 @@ var leaf5 = new Leaf(10, 460);
  * @param {number} y - Y coordinate
  */
 var Cherry = function(x, y) {
-    this.sprite = 'images/cherry.png';
-    this.description = 'cherry';
-    this.width = 60;
-    this.height = 70;
-    //Call superclass
-    CollectibleItem.call(this, x, y);
+	this.sprite = 'images/cherry.png';
+	this.description = 'cherry';
+	this.width = 60;
+	this.height = 70;
+	//Call superclass
+	CollectibleItem.call(this, x, y);
 };
 
 //Delegate failed lookups in Cherry.prototype to CollectibleItem.prototype (Subclass prototype delegation)
@@ -432,12 +434,12 @@ var cherry2 = new Cherry(400, 300);
  * @param {number} y - Y coordinate
  */
 var Gem = function(x, y) {
-    this.sprite = 'images/Gem Blue.png';
-    this.description = 'gem';
-    this.width = 60;
-    this.height = 100;
-    //Call superclass
-    CollectibleItem.call(this, x, y);
+	this.sprite = 'images/Gem Blue.png';
+	this.description = 'gem';
+	this.width = 60;
+	this.height = 100;
+	//Call superclass
+	CollectibleItem.call(this, x, y);
 };
 
 //Delegate failed lookups in Gem.prototype to CollectibleItem.prototype (Subclass prototype delegation)
@@ -463,9 +465,9 @@ var allCollectibleItems = [leaf1, leaf2, leaf3, leaf4, leaf5, cherry1, cherry2, 
  * @param {number} y - Y coordinate
  */
 var Star = function(x, y) {
-    this.sprite = 'images/Star.png';
-    this.x = x;
-    this.y = y;
+	this.sprite = 'images/Star.png';
+	this.x = x;
+	this.y = y;
 };
 
 //Star coordinates (Constants)
@@ -479,5 +481,5 @@ var star = new Star(STARX, STARY);
  * Method to render Star on the screen
  */
 Star.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+	ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };

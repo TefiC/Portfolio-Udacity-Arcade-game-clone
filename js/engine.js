@@ -126,6 +126,7 @@ var Engine = (function(global) {
 	function update(dt) {
 		updateEntities(dt);
 		checkCollisions();
+		checkEnemiesOverlapping();
 	}
 
 	/* This is called by the update function and loops through all of the
@@ -146,8 +147,24 @@ var Engine = (function(global) {
 	}
 
 	/**
+	 * Checks if enemies are overlapping in columns where there are two vertical enemies.
+	 * The for loop checks each enemy in the allEnemies array (except the last one) and determines if
+	 * the vertical distance between the current enemy being analyzed and the next one is less than 150px,
+	 * and if that's the case, it sets the current enemy's Y coordinate to a random integer between 400px (included)
+	 * and 500px (excluded) below the next enemy in that same column.
+	 */
+	function checkEnemiesOverlapping() {
+		for(var i=0; i<allEnemies.length-1; i++){
+			if(Math.abs(allEnemies[i].y - allEnemies[i+1].y)<150 && allEnemies[i].x==allEnemies[i+1].x){
+				var randomDelta = Math.floor(Math.random() * (500 - 400)) + 400;
+				allEnemies[i].y = allEnemies[i+1].y + randomDelta;
+			}
+		}
+	}
+
+	/**
 	 * Checks collision between the player and enemies, collectible items and the finish line (Star).
-	 * Excutes three functions to check each collisions with each one.
+	 * Executes three functions to check collisions with each one.
 	 */
 	function checkCollisions() {
 
@@ -203,7 +220,7 @@ var Engine = (function(global) {
 		 * and there is more than 1 level and the player reaches the minimum score to pass to the next level, plays a sound and
 		 * executes a function to move on to the next level. Else, if the player is on the max level, collides with the star, and
 		 * it reaches the minimum score to pass, it sets starCollision to true so the game engine will stop and execute youWin().
-	 	 * Lastly, for both cases,it resets the player's coordinates.
+		 * Lastly, for both cases, it resets the player's coordinates.
 		 */
 		function checkCollisionStar() {
 
@@ -367,11 +384,7 @@ var Engine = (function(global) {
 	/**
 	 * Function to handle everything related to moving on to the next level. It sets a variable for the current level's score
 	 * depending on the current level. It adds 1 to the variable "level" so the tile layout will update.
-	 * It sets the variable "score" for the new level to 0, then it checks each enemy in allEnemies array and if it moves
-	 * vertically, it assigns it a new random Y coordinate. Then it generates a new Y coordinate for each enemy, making sure that
-	 * they don't overlap by checking if the columns have more than one vertical enemy. If that's the case, one enemy gets assigned a
-	 * Y coordinate on the top half of the canvas while the next one gets assigned a Y coordinate at the bottom half of the canvas,
-	 * making sure they don't overlap.
+	 * It sets the variable "score" for the new level to 0, and finally generates a new Y coordinate for each vertical enemy.
 	 */
 	function nextLevel() {
 
@@ -390,32 +403,12 @@ var Engine = (function(global) {
 		newEnemyLocation();
 
 		/**
-		* Function to generate and assign a new random Y coordinate for enemies once the player moves on to the next
-		* level. It loops through allEnemies array and checks if the enemy being analyzed is the first enemy
-		* in the array, if that's the case, it generate a random Y coordinate within the top half of the canvas,
-		* and assigns it to the enemy's Y coordinate.
-		* If the enemy being analyzed is not the first in the array, and if it moves in the Y axis,
-		* it checks certain conditions: The first condition checks if there is more than one enemy is that column,
-		* and if the enemy is the first one in the array located in that column. If that's the case, it generates a new
-		* random Y coordinate for the enemy within the top half of the canvas. The second condition also checks if there
-		* is more than one enemy in that column and if the enemy is the second one in that column. If that's the case,
-		* it generate a new Y coordinate for the enemy within the bottom half of the canvas. Else, if the ennemy is the
-		* only one in the column, it generates a random Y coordinate within the whole range of the canvas height.
+		* Generates and assigns a new Y coordinate for vertical enemies
 		*/
 		function newEnemyLocation() {
 			for (var i=0; i<allEnemies.length; i++){
-
-				if (allEnemies[i].axis=='y' && i==0){
-					allEnemies[i].y = generateRandomTopCoordY();
-
-				}else if(allEnemies[i].axis=='y' && i>0) {
-					if(allEnemies[i].x==allEnemies[i+1].x){
-						allEnemies[i].y = generateRandomTopCoordY();
-					}else if(allEnemies[i].x==allEnemies[i-1].x){
-						allEnemies[i].y = generateRandomBottomCoordY();
-					}else{
-						allEnemies[i].y = generateRandomCoordY();
-					}
+				if(allEnemies[i].axis=="y") {
+					allEnemies[i].y = generateRandomCoordY();
 				}
 			}
 		}
