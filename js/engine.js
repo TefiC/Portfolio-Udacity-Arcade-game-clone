@@ -151,14 +151,14 @@ var Engine = (function(global) {
 	 * The for loop checks each enemy in the allEnemies array (except the last one) and determines if
 	 * the vertical distance between the current enemy being analyzed and the next one is less than 150px,
 	 * and if that's the case, it sets the current enemy's Y coordinate to a random integer between 400px (included)
-	 * and 500px (excluded) below the next enemy in that same column.
+	 * and 500px (excluded) below the next enemy in that same column. Finally, it checks if the new Y coordinate
+	 * is greater than 700, and if that's the case, it calls that enemy's reset method.
 	 */
 	function checkEnemiesOverlapping() {
 		for(var i=0; i<allEnemies.length-1; i++){
 			if(Math.abs(allEnemies[i].y - allEnemies[i+1].y)<150 && allEnemies[i].x==allEnemies[i+1].x){
 				var randomDelta = Math.floor(Math.random() * (500 - 400)) + 400;
 				allEnemies[i].y = allEnemies[i+1].y + randomDelta;
-				console.log("RANDOM DELTA!!! " + randomDelta + " " + allEnemies[i].description);
 
 				if(allEnemies[i].y>700){
 					allEnemies[i].reset();
