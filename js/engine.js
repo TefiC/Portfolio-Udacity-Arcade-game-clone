@@ -158,6 +158,11 @@ var Engine = (function(global) {
 			if(Math.abs(allEnemies[i].y - allEnemies[i+1].y)<150 && allEnemies[i].x==allEnemies[i+1].x){
 				var randomDelta = Math.floor(Math.random() * (500 - 400)) + 400;
 				allEnemies[i].y = allEnemies[i+1].y + randomDelta;
+				console.log("RANDOM DELTA!!! " + randomDelta + " " + allEnemies[i].description);
+
+				if(allEnemies[i].y>700){
+					allEnemies[i].reset();
+				}
 			}
 		}
 	}
